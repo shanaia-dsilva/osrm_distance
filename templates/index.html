@@ -1,246 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSRM Distance Calculator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OSRM Distance Calculator</title>
+
+  <!-- CSS -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/osrm.css') }}" rel="stylesheet" />
+
+  <!-- JavaScript -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav id="nav-bar">
-        <div class="container-fluid">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-route me-2"></i>
-                <span>Baghirathi Travel Solutions Private Limited</span>
-            </div>
-        </div>
-    </nav>
+  <!-- Navigation -->
+  <nav id="nav-bar">
+    <div class="custom-container">
+      <div class="nav-content">
+        <img src="/uploads/logo.png" width="30" class="icon-img" alt="Logo" />
+        <span>Baghirathi Travel Solutions Private Limited</span>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Dashboard Section -->
-    <section id="dashboard-sec">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1>Open Source Routing Machine</h1>
-                    <p class="lead">Manage your route distance projects</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn new-project" onclick="scrollToUpload()">
-                        <i class="fas fa-plus me-2"></i>New Project
+  <!-- Dashboard Section -->
+  <section id="dashboard-sec">
+    <div class="custom-container">
+      <div class="title-text">
+        <div class="header">
+          <h1>Open Source Routing Machine</h1>
+          <p class="lead">Manage your route distance projects</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- Description Section -->
+  <section id="description-sec">
+    <p class="section-description">
+      Easy to use routing tool. Calculates distances automatically for the imported data.
+    </p>
+
+    <!-- Phase Cards -->
+    <div class="process-container">
+
+      <div class="phase">
+        <div class="col">
+          <div class="phase-card" onclick="document.getElementById('file-input').click()">
+            <img src="/uploads/upload.png" class="project-icon" alt="Upload" />
+            <p class="project-title">Phase 1<br />Upload Your Data</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="phase-card">
+            <img src="/uploads/process.png" class="project-icon" alt="Processing" />
+            <p class="project-title">Phase 2<br />Data Processing</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="phase-card">
+            <img src="/uploads/route-project.jpg" class="project-icon" alt="Calculation" />
+            <p class="project-title">Phase 3<br />Distance Calculation</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="phase-card">
+            <img src="/uploads/export-icon.png" class="project-icon" alt="Export" />
+            <p class="project-title">Phase 4<br />Export Results</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Section -->
+      <div class="custom-row">
+        <div class="custom-col">
+          <div class="data-container">
+            <h3>Upload Your Files.</h3>
+
+            <!-- Toggle -->
+            <div class="input-toggle">
+              <button class="custom-toggle-btn active" onclick="switchToUpload()">
+                <img src="/uploads/upload-icon.png" width="16" class="me-2" alt="Upload" />File Upload
+              </button>
+              <button class="custom-toggle-btn" onclick="switchToPaste()">
+                <img src="/uploads/copy-paste.png" width="16" class="me-2" alt="Paste" />Paste Data
+              </button>
+            </div>
+
+            <!-- File Upload -->
+            <div id="upload-section" class="upload-section">
+              <div class="drag-area" id="drag-area">
+                <form id="csv-form" enctype="multipart/form-data">
+                  <div class="drag-content">
+                    <img src="/uploads/folder.png" width="50" class="mb-3" alt="Drag Drop" />
+                    <div class="header">Drag & Drop</div>
+                    <div class="header">
+                      or <span class="button" onclick="document.getElementById('file-input').click()">browse</span>
+                    </div>
+                    <input type="file" id="file-input" name="file" accept=".csv" hidden />
+                    <div class="support">
+                      Supports: .csv files only<br />(save excel files as csv to upload)
+                    </div>
+                    <button type="submit" class="upload-btn">
+                      <img src="/uploads/upload-icon.png" width="16" alt="Upload CSV" />Upload CSV
                     </button>
-                </div>
+                  </div>
+                </form>
+              </div>
             </div>
+
+            <!-- Paste Section -->
+            <div id="paste-section" class="paste-section" style="display: none;">
+              <div class="paste-area">
+                <div class="form-group">
+                  <label for="paste-input">Paste your data here:</label>
+                  <textarea id="paste-input" class="text-area" rows="10"></textarea>
+                </div>
+                <button type="button" class="upload-btn" onclick="processPastedData()">
+                  <img src="/uploads/back.png" width="16" alt="Process" />Process Data
+                </button>
+              </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div id="status" class="status-box"></div>
+          </div>
         </div>
-    </section>
 
-    <hr class="section-divider">
-
-    <!-- Description Section -->
-    <section id="description-sec">
-        <div class="container">
-            <h2 class="text-center mb-4">Easy to use routing tool. Calculates distances automatically for the imported data.</h2>
-            
-            <!-- Phase Cards -->
-            <div class="row mb-5">
-                <div class="col-md-3">
-                    <div class="phase-card">
-                        <i class="fas fa-upload project-icon"></i>
-                        <p class="project-title">Phase 1<br>Upload Your Data</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="phase-card">
-                        <i class="fas fa-cogs project-icon"></i>
-                        <p class="project-title">Phase 2<br>Data Processing</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="phase-card">
-                        <i class="fas fa-calculator project-icon"></i>
-                        <p class="project-title">Phase 3<br>Distance Calculation</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="phase-card">
-                        <i class="fas fa-download project-icon"></i>
-                        <p class="project-title">Phase 4<br>Export Results</p>
-                    </div>
-                </div>
+        <!-- Requirements Section -->
+        <div class="custom-col">
+          <div id="file-stat">
+            <h3>
+              <img src="/uploads/required.jpg" width="24" class="me-2" alt="Info" />Required CSV Format:
+            </h3>
+            <p>Required columns (exact names):</p>
+            <div class="table-preview-wrapper">
+              <table class="preview">
+                <tr>
+                  <td>Vehicle Number</td>
+                  <td>Institute</td>
+                </tr>
+                <tr>
+                  <td>Point 1 latitude</td>
+                  <td>Point 1 longitude</td>
+                </tr>
+                <tr>
+                  <td>Point 2 latitude</td>
+                  <td>Point 2 longitude</td>
+                </tr>
+              </table>
             </div>
-
-            <!-- Data Input Section -->
-            <div class="row">
-                <!-- Upload Section -->
-                <div class="col-md-6">
-                    <div class="data-container">
-                        <h3><i class="fas fa-cloud-upload-alt me-2"></i>Upload Your Files</h3>
-                        
-                        <!-- Input Method Toggle -->
-                        <div class="input-toggle mb-3">
-                            <button class="btn btn-toggle active" onclick="switchToUpload()">
-                                <i class="fas fa-file-upload me-2"></i>File Upload
-                            </button>
-                            <button class="btn btn-toggle" onclick="switchToPaste()">
-                                <i class="fas fa-paste me-2"></i>Paste Data
-                            </button>
-                        </div>
-                        
-                        <!-- File Upload -->
-                        <div id="upload-section" class="upload-section">
-                            <div class="drag-area" id="drag-area">
-                                <form id="csv-form" enctype="multipart/form-data">
-                                    <div class="text-center">
-                                        <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
-                                        <div class="header">Drag & Drop</div>
-                                        <div class="header">or <span class="button" onclick="document.getElementById('file-input').click()">browse</span></div>
-                                        <input type="file" id="file-input" name="file" accept=".csv" hidden>
-                                        <div class="support">Supports: .csv files only<br>(save excel files as csv to upload)</div>
-                                        <button type="submit" class="btn upload-btn">
-                                            <i class="fas fa-upload me-2"></i>Upload CSV
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        
-                        <!-- Paste Section -->
-                        <div id="paste-section" class="paste-section" style="display: none;">
-                            <div class="paste-area">
-                                <div class="mb-3">
-                                    <label for="paste-input" class="form-label">Paste your data here:</label>
-                                    <textarea 
-                                        id="paste-input" 
-                                        class="form-control" 
-                                        rows="10" 
-                                        placeholder="Paste your tabular data here (supports tab-separated, comma-separated, or pipe-separated values)&#10;&#10;Example:&#10;Vehicle Number,Institute,Point 1 latitude,Point 1 longitude,Point 2 latitude,Point 2 longitude&#10;VH001,Institute A,40.7128,-74.0060,40.7589,-73.9851&#10;VH002,Institute B,34.0522,-118.2437,34.0522,-118.2437"
-                                    ></textarea>
-                                </div>
-                                <button type="button" class="btn upload-btn" onclick="processPastedData()">
-                                    <i class="fas fa-paste me-2"></i>Process Data
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Status Messages -->
-                        <div id="status" class="mt-3"></div>
-                    </div>
-                </div>
-                
-                <!-- Requirements Section -->
-                <div class="col-md-6">
-                    <div id="file-stat">
-                        <h3><i class="fas fa-info-circle me-2"></i>Required CSV Format:</h3>
-                        <p>Required columns (exact names):</p>
-                        <div class="table-responsive">
-                            <table class="table table-bordered csv-details">
-                                <thead>
-                                    <tr>
-                                        <th>Column Name</th>
-                                        <th>Description</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Vehicle Number</td>
-                                        <td>Unique identifier for vehicle</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Institute</td>
-                                        <td>Institution name</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Point 1 latitude</td>
-                                        <td>Starting point latitude (-90 to 90)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Point 1 longitude</td>
-                                        <td>Starting point longitude (-180 to 180)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Point 2 latitude</td>
-                                        <td>Ending point latitude (-90 to 90)</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Point 2 longitude</td>
-                                        <td>Ending point longitude (-180 to 180)</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="text-center">
-                            <a href="{{ url_for('download_sample') }}" class="btn download-btn">
-                                <i class="fas fa-download me-2"></i>Download Sample CSV
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <div class="download-sample-link">
+              <a href="/download-sample" class="download-btn">
+                <img src="/uploads/export-icon.png" width="16" alt="Download" />Download Sample CSV
+              </a>
             </div>
-            
-            <!-- Preview Section -->
-            <div class="row mt-4" id="preview-section" style="display: none;">
-                <div class="col-12">
-                    <div class="table-wrapper">
-                        <h4><i class="fas fa-eye me-2"></i>Preview of your data:</h4>
-                        <p id="preview-info">(First 5 rows)</p>
-                        <div class="table-responsive">
-                            <table class="table table-striped data_head" id="preview-table">
-                                <!-- Preview data will be inserted here -->
-                            </table>
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn btn-primary" onclick="calculateDistances()" id="calculate-btn">
-                                <i class="fas fa-calculator me-2"></i>Calculate Distances
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Results Section -->
-            <div class="row mt-4" id="results-section" style="display: none;">
-                <div class="col-12">
-                    <div class="results-container">
-                        <h3><i class="fas fa-chart-line me-2"></i>Distance Calculation Results</h3>
-                        <div id="results-summary" class="mb-3"></div>
-                        <div class="table-responsive">
-                            <table class="table table-striped" id="results-table">
-                                <!-- Results will be inserted here -->
-                            </table>
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn export-results" onclick="exportResults()" id="export-btn">
-                                <i class="fas fa-download me-2"></i>Download Results
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Progress Modal -->
-            <div class="modal fade" id="progressModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Calculating Distances</h5>
-                        </div>
-                        <div class="modal-body">
-                            <div class="progress mb-3">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                     role="progressbar" style="width: 0%" id="progress-bar"></div>
-                            </div>
-                            <p id="progress-text">Initializing calculation...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="preview-section" id="preview-section" style="display: none;">
+      <div class="table-wrapper">
+        <h4>
+          <img src="/uploads/graph.png" width="20" class="me-2" alt="Preview" />Preview of your data:
+        </h4>
+        <p id="preview-info">(First 5 rows)</p>
+        <table class="table-preview" id="preview-table"></table>
+        <div class="calculate-button-wrapper">
+          <button class="calculate-btn" onclick="calculateDistances()" id="calculate-btn">
+            <img src="/uploads/calculate-icon.png" width="16" alt="Calculate" />Calculate Distances
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section" id="results-section" style="display: none;">
+      <div class="results-container">
+        <h3>
+          <img src="/uploads/graph.png" width="20" alt="Results" />Distance Calculation Results
+        </h3>
+        <div id="results-summary" class="summary"></div>
+        <table class="results-table" id="results-table"></table>
+        <div class="export">
+          <button class="btn-export-results" onclick="exportResults()" id="export-btn">
+            <img src="/uploads/export-icon.png" alt="Download" />Download Results
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div class="modal" id="progressModal" style="display: none;">
+      <div class="modal-content">
+        <h5 class="modal-title">Calculating Distances</h5>
+        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+        <p id="progress-text">Initializing calculation...</p>
+      </div>
+    </div>
+  </section>
 </body>
+
 </html>

@@ -31,18 +31,19 @@ function initializeDragDrop() {
     
     dragArea.addEventListener('dragover', function(e) {
         e.preventDefault();
-        dragArea.classList.add('active');
+        dragArea.classList.add('hover');
+        // dragArea.classList.add('active');
     });
     
     dragArea.addEventListener('dragleave', function(e) {
         e.preventDefault();
-        dragArea.classList.remove('active');
+        dragArea.classList.remove('hover');
     });
     
     dragArea.addEventListener('drop', function(e) {
         e.preventDefault();
-        dragArea.classList.remove('active');
-        
+        dragArea.classList.remove('hover');
+        // dragArea.classList.remove('active');
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             const fileInput = document.getElementById('file-input');
@@ -404,3 +405,14 @@ function formatBytes(bytes, decimals = 2) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
+// function switchToUpload() {
+//     document.getElementById("upload-section").style.display = "block";
+//     document.getElementById("paste-section").style.display = "none";
+// }
+
+// function switchToPaste() {
+//     document.getElementById("upload-section").style.display = "none";
+//     document.getElementById("paste-section").style.display = "block";
+// }
+

@@ -3,6 +3,8 @@ import logging
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from flask import send_from_directory
+
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -10,6 +12,10 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+@app.route('/uploads/<path:filename>')
+def uploaded_files(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
