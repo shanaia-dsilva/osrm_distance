@@ -1,88 +1,47 @@
-// Global variables
+// =======================
+// Global Variables
+// =======================
 let currentData = null;
 let currentResults = null;
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', function () {
-    initializeFileUpload();
-    initializeDragDrop();
+// =======================
+// Initialization
+// =======================
+document.addEventListener('DOMContentLoaded', () => {
+    setupFileUpload();
+    setupDragDrop();
+    initializeSmartPaste();
+    setupResetButton();
+    document.getElementById('process-data-btn').addEventListener('click', processPastedData);
 });
 
-// File Upload Initialization
-function initializeFileUpload() {
+// =======================
+// File Upload
+// =======================
+
+function setupFileUpload() {
     const form = document.getElementById('csv-form');
     const fileInput = document.getElementById('file-input');
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', (e) => {
         e.preventDefault();
-        uploadFile();
+        uploadCSV();
     });
 
-    fileInput.addEventListener('change', function (e) {
-        if (e.target.files.length > 0) {
-            uploadFile();
-        }
+    fileInput.addEventListener('change', () => {
+        showStatus('File selected. Click "Upload CSV File" to continue.', 'info');
     });
 }
 
-// Drag & Drop Initialization
-function initializeDragDrop() {
-    const dragArea = document.getElementById('drag-area');
-
-    dragArea.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        dragArea.classList.add('hover');
-    });
-
-    dragArea.addEventListener('dragleave', function (e) {
-        e.preventDefault();
-        dragArea.classList.remove('hover');
-    });
-
-    dragArea.addEventListener('drop', function (e) {
-        e.preventDefault();
-        dragArea.classList.remove('hover');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            const fileInput = document.getElementById('file-input');
-            fileInput.files = files;
-            uploadFile();
-        }
-    });
-}
-
-// Switch between upload and paste
-function setActiveToggle(index) {
-    document.querySelectorAll('.btn-toggle').forEach((btn, i) => {
-        btn.classList.toggle('active', i === index);
-    });
-}
-
-function switchToUpload() {
-    document.getElementById('upload-section').style.display = 'block';
-    document.getElementById('paste-section').style.display = 'none';
-    setActiveToggle(0);  // Set upload button active
-}
-
-function switchToPaste() {
-    document.getElementById('upload-section').style.display = 'none';
-    document.getElementById('paste-section').style.display = 'block';
-    setActiveToggle(1);  // Set paste button active
-}
-
-
-// File Upload
-function uploadFile() {
-    const fileInput = document.getElementById('file-input');
-    const file = fileInput.files[0];
-
-    if (!file) return showStatus('Please select a file', 'error');
-    if (!file.name.toLowerCase().endsWith('.csv')) return showStatus('Please select a CSV file', 'error');
+function uploadCSV() {
+    const file = document.getElementById('file-input').files[0];
+    if (!file) return showStatus('Please select a file.', 'error');
+    if (!file.name.toLowerCase().endsWith('.csv')) return showStatus('Only CSV files are supported.', 'error');
 
     const formData = new FormData();
     formData.append('file', file);
 
-    showStatus('Uploading file...', 'info');
+    showStatus('Uploading CSV...', 'info');
 
     fetch('/upload', {
         method: 'POST',
@@ -99,62 +58,204 @@ function uploadFile() {
             }
         })
         .catch(err => {
-            console.error('Upload error:', err);
-            showStatus('Error uploading file', 'error');
+            console.error('Upload Error:', err);
+            showStatus('Error uploading file.', 'error');
         });
 }
 
-// Process Paste Data
+// =======================
+// Drag & Drop
+// =======================
+function setupDragDrop() {
+    const dragArea = document.getElementById('drag-area');
+
+    dragArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dragArea.classList.add('hover');
+    });
+
+    dragArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dragArea.classList.remove('hover');
+    });
+
+    dragArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragArea.classList.remove('hover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const fileInput = document.getElementById('file-input');
+            fileInput.files = files;
+            showStatus('File dropped. Click "Upload CSV File" to continue.', 'info');
+        }
+    });
+}
+
+// =======================
+// Paste Input (Structured Columns)
+// =======================
+
+function setActiveToggle(index) {
+    document.querySelectorAll('.btn-toggle').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+    });
+}
+
+function switchToUpload() {
+    document.getElementById('upload-section').style.display = 'block';
+    document.getElementById('paste-section').style.display = 'none';
+    setActiveToggle(0);
+}
+
+function switchToPaste() {
+    document.getElementById('upload-section').style.display = 'none';
+    document.getElementById('paste-section').style.display = 'block';
+    setActiveToggle(1);
+}
+
+const pasteFieldIds = [
+    'vehicle-number', 'institute',
+    'point1-lat', 'point1-lon',
+    'point2-lat', 'point2-lon'
+];
+
+function setupPasteFields() {
+    const mainField = document.getElementById(pasteFieldIds[0]);
+
+    mainField.addEventListener('paste', (e) => {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (!text.includes('\t')) return;
+
+        e.preventDefault();
+
+        const rows = text.trim().split('\n').map(row => row.split('\t'));
+        const isHeaderRow = rows[0].some(cell => /vehicle|institute|lat|lon/i.test(cell));
+        const dataRows = isHeaderRow ? rows.slice(1) : rows;
+
+        const columns = Array.from({ length: pasteFieldIds.length }, (_, i) =>
+            dataRows.map(row => row[i] || '').join('\n')
+        );
+
+        pasteFieldIds.forEach((id, i) => {
+            document.getElementById(id).value = columns[i] || '';
+        });
+
+        showStatus('Data pasted. Click "Process Data" to continue.', 'info');
+    });
+}
+
+document.getElementById('process-data-btn').addEventListener('click', processPastedData);
+
+function initializeSmartPaste() {
+    const allPasteFields = [
+        'vehicle-number',
+        'institute',
+        'point1-lat',
+        'point1-lon',
+        'point2-lat',
+        'point2-lon'
+    ];
+
+    allPasteFields.forEach((id, startIndex) => {
+        const field = document.getElementById(id);
+
+        field.addEventListener('paste', function (e) {
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            if (!pastedText.includes('\t')) return;
+
+            e.preventDefault();
+
+            const lines = pastedText.trim().split('\n').map(line => line.split('\t'));
+
+            // Check for headers in first row and skip
+            const isHeaderRow = lines[0].some(cell =>
+                /vehicle|institute|lat|lon/i.test(cell)
+            );
+            const dataRows = isHeaderRow ? lines.slice(1) : lines;
+
+            // Fill starting from the currently focused field
+            dataRows.forEach((row, rowIndex) => {
+                row.forEach((cell, offset) => {
+                    const colIndex = startIndex + offset;
+                    if (colIndex < allPasteFields.length) {
+                        const targetField = document.getElementById(allPasteFields[colIndex]);
+                        const lines = targetField.value.split('\n');
+                        lines[rowIndex] = cell;
+                        targetField.value = lines.join('\n');
+                    }
+                });
+            });
+
+            showStatus('Data pasted. Click "Process Data" to continue.', 'info');
+        });
+    });
+}
+
+// =======================
 function processPastedData() {
-    const content = document.getElementById('paste-input').value.trim();
-    if (!content) return showStatus('Please paste some data', 'error');
+    const rowCount = document.getElementById('vehicle-number').value.trim().split('\n').length;
+    const rows = [];
+
+    for (let i = 0; i < rowCount; i++) {
+        const row = pasteFieldIds.map(id =>
+            (document.getElementById(id).value.split('\n')[i] || '').trim()
+        );
+        rows.push(row.join('\t'));
+    }
+
+    const headers = [
+        'Vehicle Number', 'Institute',
+        'Point 1 latitude', 'Point 1 longitude',
+        'Point 2 latitude', 'Point 2 longitude'
+    ];
+
+    const payload = [headers.join('\t'), ...rows].join('\n');
 
     showStatus('Processing pasted data...', 'info');
 
     fetch('/process_paste', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content })
+        body: JSON.stringify({ content: payload })
     })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
                 currentData = data.preview.rows;
                 showPreview(data.preview);
-                showStatus(`Data processed successfully! ${data.row_count} rows loaded.`, 'success');
+                showStatus(`Pasted data processed. ${data.row_count} rows loaded.`, 'success');
             } else {
                 showStatus(data.error, 'error');
             }
         })
         .catch(err => {
-            console.error('Process error:', err);
-            showStatus('Error processing data', 'error');
+            console.error('Paste process error:', err);
+            showStatus('Error processing pasted data.', 'error');
         });
 }
 
-// Preview Data
-function showPreview(previewData) {
-    const previewSection = document.getElementById('preview-section');
-    const previewTable = document.getElementById('preview-table');
-    const previewInfo = document.getElementById('preview-info');
+// =======================
+// Preview Table
+// =======================
+function showPreview(preview) {
+    const table = document.getElementById('preview-table');
+    const info = document.getElementById('preview-info');
+    const section = document.getElementById('preview-section');
 
-    // Clear existing content
-    previewTable.innerHTML = '';
+    table.innerHTML = '';
 
-    // Create table header
     const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    previewData.columns.forEach(column => {
+    const headRow = document.createElement('tr');
+    preview.columns.forEach(col => {
         const th = document.createElement('th');
-        th.textContent = column;
-        headerRow.appendChild(th);
+        th.textContent = col;
+        headRow.appendChild(th);
     });
-    thead.appendChild(headerRow);
-    previewTable.appendChild(thead);
+    thead.appendChild(headRow);
+    table.appendChild(thead);
 
-    // Create table body
     const tbody = document.createElement('tbody');
-    previewData.rows.forEach(row => {
+    preview.rows.forEach(row => {
         const tr = document.createElement('tr');
         row.forEach(cell => {
             const td = document.createElement('td');
@@ -163,23 +264,21 @@ function showPreview(previewData) {
         });
         tbody.appendChild(tr);
     });
-    previewTable.appendChild(tbody);
+    table.appendChild(tbody);
 
-    // Update preview info
-    previewInfo.textContent = `(Showing ${previewData.preview_rows} of ${previewData.total_rows} rows)`;
+    info.textContent = `(Showing ${preview.preview_rows} of ${preview.total_rows} rows)`;
+    section.style.display = 'block';
 
-    // Show preview section
-    previewSection.style.display = 'block';
-
-    // Scroll to preview after a short delay to allow DOM update
     setTimeout(() => {
-        previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);  // 100ms delay ensures layout is ready
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
 }
 
+// =======================
 // Distance Calculation
+// =======================
 function calculateDistances() {
-    if (!currentData) return showStatus('No data loaded', 'error');
+    if (!currentData) return showStatus('No data loaded.', 'error');
 
     updateProgress(25, 'Sending data to server...');
 
@@ -204,34 +303,26 @@ function calculateDistances() {
             if (data.success) {
                 currentResults = data.results;
                 showResults(data);
-                showStatus('Distance calculation completed successfully!', 'success');
+                showStatus('Distance calculation complete.', 'success');
             } else {
                 showStatus(data.error, 'error');
             }
         })
         .catch(err => {
-            console.error('Calculation error:', err);
-            showStatus('Error calculating distances', 'error');
+            console.error('Distance calculation error:', err);
+            showStatus('Error during distance calculation.', 'error');
         });
 }
 
-// Results Rendering
+// =======================
+// Show Results Table
+// =======================
 function showResults(data) {
-    const resultsSection = document.getElementById('results-section');
-    const resultsTable = document.getElementById('results-table');
-    const resultsSummary = document.getElementById('results-summary');
+    const table = document.getElementById('results-table');
+    const section = document.getElementById('results-section');
+    const summaryBox = document.getElementById('results-summary');
 
-    resultsTable.innerHTML = '';
-    const summary = data.summary;
-
-    resultsSummary.innerHTML = `
-        <div class="summary-box">
-            <strong>Calculation Summary:</strong><br>
-            Total routes: ${summary.total_routes}<br>
-            Successful: ${summary.successful_calculations}<br>
-            Failed: ${summary.failed_calculations}
-        </div>
-    `;
+    table.innerHTML = '';
 
     const columns = [
         'Vehicle Number', 'Institute',
@@ -240,15 +331,24 @@ function showResults(data) {
         'Distance_km', 'Duration_minutes'
     ];
 
+    summaryBox.innerHTML = `
+        <div class="summary-box">
+            <strong>Calculation Summary:</strong><br>
+            Total routes: ${data.summary.total_routes}<br>
+            Successful: ${data.summary.successful_calculations}<br>
+            Failed: ${data.summary.failed_calculations}
+        </div>
+    `;
+
     const thead = document.createElement('thead');
-    const trHead = document.createElement('tr');
+    const tr = document.createElement('tr');
     columns.forEach(col => {
         const th = document.createElement('th');
         th.textContent = col.replace(/_/g, ' ');
-        trHead.appendChild(th);
+        tr.appendChild(th);
     });
-    thead.appendChild(trHead);
-    resultsTable.appendChild(thead);
+    thead.appendChild(tr);
+    table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
     data.results.forEach(row => {
@@ -257,27 +357,27 @@ function showResults(data) {
             const td = document.createElement('td');
             let val = row[col];
 
-            if (col === 'Distance_km' && val !== null) val = parseFloat(val).toFixed(3);
-            if (col === 'Duration_minutes' && val !== null) val = parseFloat(val).toFixed(1);
+            if (col === 'Distance_km' && val != null) val = parseFloat(val).toFixed(3);
+            if (col === 'Duration_minutes' && val != null) val = parseFloat(val).toFixed(1);
 
             td.textContent = val ?? 'N/A';
             tr.appendChild(td);
         });
         tbody.appendChild(tr);
     });
+    table.appendChild(tbody);
 
-    resultsTable.appendChild(tbody);
-    resultsSection.style.display = 'block';
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    section.style.display = 'block';
+    section.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Export Results
+// =======================
+// Export CSV
+// =======================
 function exportResults() {
-    if (!currentResults) return showStatus('No results to export', 'error');
+    if (!currentResults) return showStatus('No results to export.', 'error');
 
-    const dataStr = JSON.stringify(currentResults);
-    const url = `/export/csv?data=${encodeURIComponent(dataStr)}`;
-
+    const url = `/export/csv?data=${encodeURIComponent(JSON.stringify(currentResults))}`;
     const link = document.createElement('a');
     link.href = url;
     link.download = 'distance_results.csv';
@@ -288,17 +388,35 @@ function exportResults() {
     showStatus('Results exported successfully!', 'success');
 }
 
-// Status Message
+// =======================
 function showStatus(message, type) {
-    const statusDiv = document.getElementById('status');
-    const typeClass = `status-${type}`;
-    statusDiv.innerHTML = `<div class="${typeClass}">${message}</div>`;
+    const statusBox = document.getElementById('status');
+    statusBox.innerHTML = `<div class="status-${type}">${message}</div>`;
 }
 
-// Progress Bar
 function updateProgress(percent, message) {
     const bar = document.getElementById('progress-bar');
     const text = document.getElementById('progress-text');
-    bar.style.width = percent + '%';
+    bar.style.width = `${percent}%`;
     text.textContent = message;
+}
+
+function setupResetButton() {
+    document.getElementById('reset-paste-btn').addEventListener('click', () => {
+        const pasteFieldIds = [
+            'vehicle-number',
+            'institute',
+            'point1-lat',
+            'point1-lon',
+            'point2-lat',
+            'point2-lon'
+        ];
+
+        pasteFieldIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        showStatus('All pasted fields have been cleared.', 'info');
+    });
 }
