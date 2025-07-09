@@ -237,7 +237,7 @@ function showResults(data) {
         'Vehicle Number', 'Institute',
         'Point 1 latitude', 'Point 1 longitude',
         'Point 2 latitude', 'Point 2 longitude',
-        'Distance_km', 'Duration_minutes', 'Calculation_status'
+        'Distance_km', 'Duration_minutes'
     ];
 
     const thead = document.createElement('thead');
@@ -257,11 +257,8 @@ function showResults(data) {
             const td = document.createElement('td');
             let val = row[col];
 
-            if (col === 'Distance_km' && val !== null) val = parseFloat(val).toFixed(2);
+            if (col === 'Distance_km' && val !== null) val = parseFloat(val).toFixed(3);
             if (col === 'Duration_minutes' && val !== null) val = parseFloat(val).toFixed(1);
-            if (col === 'Calculation_status') {
-                td.className = val === 'success' ? 'status-success' : 'status-failed';
-            }
 
             td.textContent = val ?? 'N/A';
             tr.appendChild(td);

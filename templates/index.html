@@ -29,8 +29,8 @@
     <div class="custom-container">
       <div class="title-text">
         <div class="header">
-          <h1>Open Source Routing Machine</h1>
-          <p class="lead">Manage your route distance projects</p>
+          <h1>OSRM Distance Tool</h1>
+          <p class="lead">Easy to use routing tool. Calculates distances automatically for the imported data.</p>
         </div>
       </div>
     </div>
@@ -40,9 +40,9 @@
 
   <!-- Description Section -->
   <section id="description-sec">
-    <p class="section-description">
-      Easy to use routing tool. Calculates distances automatically for the imported data.
-    </p>
+    <!-- <p class="section-description">
+      
+    </p> -->
 
     <!-- Phase Cards -->
     <div class="process-container">
@@ -56,13 +56,13 @@
         </div>
         <div class="col">
           <div class="phase-card">
-            <img src="/uploads/process.png" class="project-icon" alt="Processing" />
+            <img src="/uploads/optimize-icon.png" class="project-icon" alt="Processing" />
             <p class="project-title">Phase 2<br />Data Processing</p>
           </div>
         </div>
         <div class="col">
           <div class="phase-card">
-            <img src="/uploads/route-project.jpg" class="project-icon" alt="Calculation" />
+            <img src="/uploads/route.png" class="project-icon" alt="Calculation" />
             <p class="project-title">Phase 3<br />Distance Calculation</p>
           </div>
         </div>
@@ -102,7 +102,7 @@
                     </div>
                     <input type="file" id="file-input" name="file" accept=".csv" hidden />
                     <div class="support">
-                      Supports: .csv files only<br />(save excel files as csv to upload)
+                      Supports: .csv files only<br />(save excel files as .csv to upload)
                     </div>
                     <button type="submit" class="upload-btn">
                       <img src="/uploads/upload-icon.png" width="16" alt="Upload CSV" />Upload CSV
@@ -120,7 +120,7 @@
                   <textarea id="paste-input" class="text-area" rows="10"></textarea>
                 </div>
                 <button type="button" class="app-btn" onclick="processPastedData()">
-                  <img src="/uploads/back.png" width="16" alt="Process" />Process Data
+                  <img src="/uploads/optimize-icon.png" width="16" alt="Process" />Process Data
                 </button>
               </div>
             </div>
@@ -141,16 +141,19 @@
               <table class="preview">
                 <tr>
                   <td>Vehicle Number</td>
-                  <td>Institute</td>
                 </tr>
+                <tr>
+                  <td>Institute</td></tr>
                 <tr>
                   <td>Point 1 latitude</td>
-                  <td>Point 1 longitude</td>
                 </tr>
                 <tr>
+                  <td>Point 1 longitude</td></tr>
+                <tr>
                   <td>Point 2 latitude</td>
-                  <td>Point 2 longitude</td>
                 </tr>
+                <tr>
+                  <td>Point 2 longitude</td></tr>
               </table>
             </div>
             <div class="download-sample-link">
@@ -167,36 +170,33 @@
     <!-- Preview Section -->
     <div class="preview-section" id="preview-section" style="display: none;">
       <div class="table-wrapper">
-        <h4>
-          <img src="/uploads/graph.png" width="20" class="me-2" alt="Preview" />Preview of your data:
-        </h4>
+        <h4>Preview of your data:</h4>
         <p id="preview-info">(First 5 rows)</p>
         <table class="table-preview" id="preview-table"></table>
         <div class="calculate-button-wrapper">
-          <button class="app-btn" onclick="calculateDistances()" id="calculate-btn">
-            <img src="/uploads/calculate-icon.png" width="16" alt="Calculate" />Calculate Distances
+          <button class="app-btn" onclick="calculateDistances()" id="app-btn">
+            <img src="/uploads/route.png" width="16" alt="Calculate" />Calculate Distances
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Results Section -->
+    
+  </section>
+
+  <section id="results-sect">
     <div class="results-section" id="results-section" style="display: none;">
+    <h3>Distance Calculation Results</h3>
       <div class="results-container">
-        <h3>
-          <img src="/uploads/graph.png" width="20" alt="Results" />Distance Calculation Results
-        </h3>
         <div id="results-summary" class="summary"></div>
-        <table class="results-table" id="results-table"></table>
         <div class="export">
           <button class="app-btn" onclick="exportResults()" id="export-btn">
-            <img src="/uploads/export-icon.png" class="project-icon" alt="Download" />Download Results
+            <img src="/uploads/export-icon.png" class="project-icon" alt="Download" /><br>Download <br>Results
           </button>
         </div>
-      </div>
+        </div>
+        <table class="results-table" id="results-table"></table>
     </div>
-
-    <!-- Progress Modal -->
     <div class="modal" id="progressModal" style="display: none;">
       <div class="modal-content">
         <h5 class="modal-title">Calculating Distances</h5>
