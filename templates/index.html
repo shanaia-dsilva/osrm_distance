@@ -8,7 +8,6 @@
 
   <!-- CSS -->
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
-  <link href="{{ url_for('static', filename='css/osrm.css') }}" rel="stylesheet" />
 
   <!-- JavaScript -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
@@ -83,10 +82,10 @@
 
             <!-- Toggle -->
             <div class="input-toggle">
-              <button class="custom-toggle-btn active" onclick="switchToUpload()">
+              <button class="btn-toggle" onclick="switchToUpload()">
                 <img src="/uploads/upload-icon.png" width="16" class="me-2" alt="Upload" />File Upload
               </button>
-              <button class="custom-toggle-btn" onclick="switchToPaste()">
+              <button class="btn-toggle" onclick="switchToPaste()">
                 <img src="/uploads/copy-paste.png" width="16" class="me-2" alt="Paste" />Paste Data
               </button>
             </div>
@@ -120,7 +119,7 @@
                   <label for="paste-input">Paste your data here:</label>
                   <textarea id="paste-input" class="text-area" rows="10"></textarea>
                 </div>
-                <button type="button" class="upload-btn" onclick="processPastedData()">
+                <button type="button" class="app-btn" onclick="processPastedData()">
                   <img src="/uploads/back.png" width="16" alt="Process" />Process Data
                 </button>
               </div>
@@ -155,7 +154,7 @@
               </table>
             </div>
             <div class="download-sample-link">
-              <a href="/download-sample" class="download-btn">
+              <a href="/sample_distance_generator.csv" class="app-btn">
                 <img src="/uploads/export-icon.png" width="16" alt="Download" />Download Sample CSV
               </a>
             </div>
@@ -174,7 +173,7 @@
         <p id="preview-info">(First 5 rows)</p>
         <table class="table-preview" id="preview-table"></table>
         <div class="calculate-button-wrapper">
-          <button class="calculate-btn" onclick="calculateDistances()" id="calculate-btn">
+          <button class="app-btn" onclick="calculateDistances()" id="calculate-btn">
             <img src="/uploads/calculate-icon.png" width="16" alt="Calculate" />Calculate Distances
           </button>
         </div>
@@ -190,8 +189,8 @@
         <div id="results-summary" class="summary"></div>
         <table class="results-table" id="results-table"></table>
         <div class="export">
-          <button class="btn-export-results" onclick="exportResults()" id="export-btn">
-            <img src="/uploads/export-icon.png" alt="Download" />Download Results
+          <button class="app-btn" onclick="exportResults()" id="export-btn">
+            <img src="/uploads/export-icon.png" class="project-icon" alt="Download" />Download Results
           </button>
         </div>
       </div>
