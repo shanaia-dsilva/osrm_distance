@@ -6,6 +6,13 @@ body {
   padding: 0;
 }
 
+@font-face {
+  font-family: 'clashdisplay';
+  src: url('/uploads/clashdisplay-Medium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 #nav-bar {
   background-color: beige;
   height: 2.5rem;
@@ -29,16 +36,22 @@ body {
 
 h1 {
   font-size: x-large;
+  font-family: 'clashdisplay', Verdana, Geneva, Tahoma, sans-serif;
+  font-weight:lighter;
   margin: 0;
 }
 
 h3 {
   font-size: medium;
+  font-family: 'clashdisplay', Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: lighter;
   margin: 0.5rem 0;
 }
-.lead {
+p {
   color: rgb(138, 112, 75);
+  font-family: 'clashdisplay', Verdana, Geneva, Tahoma, sans-serif;
   font-size: small;
+  font-weight:50;
   margin: 0;
 }
 
@@ -549,4 +562,53 @@ img {
     padding:0.5% 6%;
   }
 }
+@media (max-width: 480px) {
+  body {
+    font-size: 16px;
+    padding:0;
+    margin:0;
+  }
+  #description-sec{
+    padding:0;
+    margin:0;
+  }
 
+  .process-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .phase {
+    display: grid;
+    flex-direction:row;
+    justify-content: space-between;
+    padding: 0rem;
+    top:0;
+    left:0;
+  }
+
+  .phase-card {
+    margin: 0rem;
+    padding: 1rem;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .custom-row {
+    flex-direction: column;
+  }
+  .data-container {
+    width:90%;
+  }
+  .custom-col {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .upload-area,
+  .file-stat {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
