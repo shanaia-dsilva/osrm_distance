@@ -1,12 +1,7 @@
-// =======================
-// Global Variables
-// =======================
+
 let currentData = null;
 let currentResults = null;
 
-// =======================
-// Initialization
-// =======================
 document.addEventListener('DOMContentLoaded', () => {
     setupFileUpload();
     setupDragDrop();
@@ -17,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // =======================
 // File Upload
-// =======================
 
 function setupFileUpload() {
     const form = document.getElementById('csv-form');
@@ -50,7 +44,7 @@ function uploadCSV() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                currentData = data.preview.rows;
+                currentData = data.full_data;
                 showPreview(data.preview);
                 showStatus(`File uploaded successfully! ${data.row_count} rows loaded.`, 'success');
             } else {
@@ -65,7 +59,6 @@ function uploadCSV() {
 
 // =======================
 // Drag & Drop
-// =======================
 function setupDragDrop() {
     const dragArea = document.getElementById('drag-area');
 
@@ -91,8 +84,6 @@ function setupDragDrop() {
     });
 }
 
-// =======================
-// Paste Input (Structured Columns)
 // =======================
 
 function setActiveToggle(index) {
@@ -221,7 +212,7 @@ function processPastedData() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                currentData = data.preview.rows;
+                currentData = data.full_data;
                 showPreview(data.preview);
                 showStatus(`Pasted data processed. ${data.row_count} rows loaded.`, 'success');
             } else {
@@ -281,17 +272,22 @@ function calculateDistances() {
     if (!currentData) return showStatus('No data loaded.', 'error');
 
     updateProgress(25, 'Sending data to server...');
-
+    const columns = [
+        'Vehicle Number', 'Institute',
+        'Point 1 latitude', 'Point 1 longitude',
+        'Point 2 latitude', 'Point 2 longitude',
+        'Distance_km', 'Duration_minutes'
+    ];
     const payload = {
-        data: currentData.map(row => ({
-            'Vehicle Number': row[0],
-            'Institute': row[1],
-            'Point 1 latitude': row[2],
-            'Point 1 longitude': row[3],
-            'Point 2 latitude': row[4],
-            'Point 2 longitude': row[5]
-        }))
-    };
+    data: currentData.map(row => ({
+        'Institute': row[1],
+        'Vehicle Number': row[0],
+        'Point 1 latitude': row[2],
+        'Point 1 longitude': row[3],
+        'Point 2 latitude': row[4],
+        'Point 2 longitude': row[5]
+    }))
+};
 
     fetch('/calculate', {
         method: 'POST',

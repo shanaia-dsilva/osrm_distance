@@ -34,12 +34,21 @@ def upload_file():
                 
                 # Store the dataframe in session or temporary storage
                 # For simplicity, we'll return the preview and let frontend handle the calculation
+                # return jsonify({
+                #     'success': True,
+                #     'preview': preview_data,
+                #     'row_count': len(df),
+                #     'message': f'Successfully loaded {len(df)} rows'
+                # })
+
                 return jsonify({
                     'success': True,
                     'preview': preview_data,
+                    'full_data': df.values.tolist(),  
                     'row_count': len(df),
                     'message': f'Successfully loaded {len(df)} rows'
                 })
+
             except Exception as e:
                 logger.error(f"Error processing CSV: {str(e)}")
                 return jsonify({'error': f'Error processing CSV: {str(e)}'}), 400
@@ -64,12 +73,21 @@ def process_paste():
             df = processor.process_pasted_data(content)
             preview_data = processor.get_preview_data(df)
             
+            # return jsonify({
+            #     'success': True,
+            #     'preview': preview_data,
+            #     'row_count': len(df),
+            #     'message': f'Successfully processed {len(df)} rows'
+            # })
+
             return jsonify({
                 'success': True,
                 'preview': preview_data,
+                'full_data': df.values.tolist(),
                 'row_count': len(df),
                 'message': f'Successfully processed {len(df)} rows'
             })
+
         except Exception as e:
             logger.error(f"Error processing pasted data: {str(e)}")
             return jsonify({'error': f'Error processing data: {str(e)}'}), 400
@@ -97,7 +115,15 @@ def calculate_distances():
         osrm_service = OSRMService()
         try:
             results_df = osrm_service.calculate_batch_distances(df)
-            
+            ordered_columns = [
+                'Institute', 'Vehicle Number',
+                'Point 1 latitude', 'Point 1 longitude',
+                'Point 2 latitude', 'Point 2 longitude',
+                'Distance_km', 'Duration_minutes','Calculation_status'
+            ]
+
+            results_df = results_df[ordered_columns]
+
             # Convert results to JSON for frontend
             results = {
                 'success': True,
@@ -129,14 +155,22 @@ def export_results(format):
         
         results = json.loads(data)
         df = pd.DataFrame(results)
+
+        ordered_columns = [
+                'Institute', 'Vehicle Number',
+                'Point 1 latitude', 'Point 1 longitude',
+                'Point 2 latitude', 'Point 2 longitude',
+                'Distance_km', 'Duration_minutes','Calculation_status'
+            ]
+        
+        df = df[ordered_columns] 
+
         
         if format.lower() == 'csv':
-            # Create CSV file
             output = io.StringIO()
             df.to_csv(output, index=False)
             output.seek(0)
             
-            # Create a BytesIO object for sending
             csv_data = io.BytesIO()
             csv_data.write(output.getvalue().encode('utf-8'))
             csv_data.seek(0)

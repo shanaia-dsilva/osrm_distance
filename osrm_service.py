@@ -44,7 +44,7 @@ class OSRMService:
                 duration_s = data['routes'][0]['duration']
                 
                 return {
-                    'distance_km': round(distance_km, 2),
+                    'distance_km': round(distance_km, 3),
                     'duration_minutes': round(duration_s / 60, 1),
                     'status': 'success'
                 }
@@ -115,10 +115,8 @@ class OSRMService:
                 
                 results.append(result_row)
                 
-                # Add small delay to avoid overwhelming the OSRM server
                 time.sleep(0.1)
                 
-                # Log progress every 10 routes
                 if (index + 1) % 10 == 0:
                     logger.info(f"Processed {index + 1}/{len(df)} routes")
                     
@@ -139,7 +137,6 @@ class OSRMService:
     def test_connection(self):
         """Test connection to OSRM server"""
         try:
-            # Test with a simple route in New York
             test_coords = "-74.0059,40.7128;-74.0060,40.7129"
             url = urljoin(self.base_url, f"/route/v1/driving/{test_coords}")
             
