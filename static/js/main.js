@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeSmartPaste();
     setupResetButton();
     document.getElementById('process-data-btn').addEventListener('click', processPastedData);
+    const modal = document.getElementById('progressModal');
+    modal.classList.add('hidden');     // Force hide
+    modal.classList.remove('show');    // Ensure it's not visible
+    updateProgress(0, '');  
 });
 
 // =======================
@@ -271,43 +275,49 @@ function showPreview(preview) {
 function calculateDistances() {
     if (!currentData) return showStatus('No data loaded.', 'error');
 
+    const modal = document.getElementById('progressModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('show');
     updateProgress(25, 'Sending data to server...');
-    const columns = [
-        'Vehicle Number', 'Institute',
-        'Point 1 latitude', 'Point 1 longitude',
-        'Point 2 latitude', 'Point 2 longitude',
-        'Distance_km', 'Duration_minutes'
-    ];
+
     const payload = {
-    data: currentData.map(row => ({
-        'Institute': row[1],
-        'Vehicle Number': row[0],
-        'Point 1 latitude': row[2],
-        'Point 1 longitude': row[3],
-        'Point 2 latitude': row[4],
-        'Point 2 longitude': row[5]
-    }))
-};
+        data: currentData.map(row => ({
+            'Institute': row[1],
+            'Vehicle Number': row[0],
+            'Point 1 latitude': row[2],
+            'Point 1 longitude': row[3],
+            'Point 2 latitude': row[4],
+            'Point 2 longitude': row[5]
+        }))
+    };
 
     fetch('/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                currentResults = data.results;
-                showResults(data);
-                showStatus('Distance calculation complete.', 'success');
-            } else {
-                showStatus(data.error, 'error');
-            }
-        })
-        .catch(err => {
-            console.error('Distance calculation error:', err);
-            showStatus('Error during distance calculation.', 'error');
-        });
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            currentResults = data.results;
+            showResults(data);
+            updateProgress(100, 'Completed!');
+            showStatus('Distance calculation complete.', 'success');
+        } else {
+            showStatus(data.error, 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Distance calculation error:', err);
+        showStatus('Error during distance calculation.', 'error');
+    })
+    .finally(() => {
+        setTimeout(() => {
+            modal.classList.remove('show');
+            modal.classList.add('hidden');
+            updateProgress(0, '');
+        }, 1000);
+    });
 }
 
 // =======================
@@ -389,6 +399,8 @@ function showStatus(message, type) {
     const statusBox = document.getElementById('status');
     statusBox.innerHTML = `<div class="status-${type}">${message}</div>`;
 }
+
+// document.getElementById('progressModal').classList.add('show');
 
 function updateProgress(percent, message) {
     const bar = document.getElementById('progress-bar');
