@@ -10,20 +10,16 @@ from flask import g
 progress_tracker = {}
 
 logger = logging.getLogger(__name__)
-
 class OSRMService:
     def __init__(self):
         self.base_url = current_app.config['OSRM_SERVER']
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': 'OSRM-Distance-Calculator/1.0'})
-        
-    def calculate_distance(self, lat1, lon1, lat2, lon2):
+
+    def calculate_distance(self, lat1, lon1, lat2, lon2, *, task_id=None, index=None, total=None):
         """Calculate distance between two points using OSRM"""
         try:
-            # Format coordinates for OSRM API
             coordinates = f"{lon1},{lat1};{lon2},{lat2}"
-            
-            # Build OSRM route URL
             url = urljoin(self.base_url, f"/route/v1/driving/{coordinates}")
             params = {
                 'overview': 'false',
@@ -32,23 +28,27 @@ class OSRMService:
                 'geometries': 'polyline',
                 'annotations': 'false'
             }
-            
+
             logger.debug(f"OSRM request: {url}")
-            
-            # Make request to OSRM
             response = self.session.get(url, params=params, timeout=30)
             response.raise_for_status()
-            
+
             data = response.json()
 
+            if task_id is not None and index is not None and total:
+                percent = int(((index + 1) / total) * 100)
+                # Update progress only if it's actually changed
+                if (task_id not in progress_tracker) or (progress_tracker[task_id].get('percent') != percent):
+                    progress_tracker[task_id] = {
+                        'percent': percent,
+                        'message': f'Sending data to the server . . . .'
+                    }
+
             if data.get('code') == 'Ok' and data.get('routes'):
-                # Extract distance in meters and convert to kilometers
                 distance_m = data['routes'][0]['distance']
-                distance_km = distance_m / 1000
                 duration_s = data['routes'][0]['duration']
-                
                 return {
-                    'distance_km': round(distance_km, 3),
+                    'distance_km': round(distance_m / 1000, 3),
                     'duration_minutes': round(duration_s / 60, 1),
                     'status': 'success'
                 }
@@ -60,7 +60,7 @@ class OSRMService:
                     'status': 'error',
                     'error': data.get('message', 'No route found')
                 }
-                
+
         except requests.exceptions.Timeout:
             logger.error(f"OSRM request timeout for coordinates: {lat1},{lon1} to {lat2},{lon2}")
             return {
@@ -85,7 +85,7 @@ class OSRMService:
                 'status': 'error',
                 'error': f'Calculation error: {str(e)}'
             }
-    
+
     def calculate_batch_distances(self, df, task_id=None):
         """Calculate distances for a batch of routes"""
         logger.info(f"Starting batch distance calculation for {len(df)} routes")
@@ -97,16 +97,16 @@ class OSRMService:
 
         for index, row in df.iterrows():
             try:
-                # Extract coordinates
                 lat1 = float(row['Point 1 latitude'])
                 lon1 = float(row['Point 1 longitude'])
                 lat2 = float(row['Point 2 latitude'])
                 lon2 = float(row['Point 2 longitude'])
 
-                # Calculate distance
-                result = self.calculate_distance(lat1, lon1, lat2, lon2)
+                result = self.calculate_distance(
+                    lat1, lon1, lat2, lon2,
+                    task_id=task_id, index=index, total=total
+                )
 
-                # Add original data to result
                 result_row = row.to_dict()
                 result_row['Distance_km'] = result['distance_km']
                 result_row['Duration_minutes'] = result['duration_minutes']
@@ -120,18 +120,7 @@ class OSRMService:
 
                 results.append(result_row)
 
-                # ✅ Update progress
-                if task_id:
-                    percent = round(((index + 1) / total) * 100, 1)
-                    progress_tracker[task_id] = {
-                        'percent': percent,
-                        'message': f'Calculated {index + 1} of {total} routes...'
-                    }
-
-                time.sleep(0.1)
-
-                if (index + 1) % 10 == 0:
-                    logger.info(f"Processed {index + 1}/{total} routes")
+                time.sleep(0.1)  # Optional: throttle for OSRM stability
 
             except Exception as e:
                 logger.error(f"Error processing row {index}: {str(e)}")
@@ -143,20 +132,12 @@ class OSRMService:
                 results.append(result_row)
                 failed_count += 1
 
-                # Still update progress if task_id is available
-                if task_id:
-                    percent = round(((index + 1) / total) * 100, 1)
-                    progress_tracker[task_id] = {
-                        'percent': percent,
-                        'message': f'Calculated {index + 1} of {total} routes...'
-                    }
-
         logger.info(f"Batch calculation completed: {successful_count} successful, {failed_count} failed")
-        
+
         if task_id:
             progress_tracker[task_id] = {
                 'percent': 100,
-                'message': 'Distance calculation complete.'
+                'message': 'Completed!'
             }
 
         return pd.DataFrame(results)

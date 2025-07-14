@@ -388,13 +388,12 @@ p {
   border-radius: 4px;
   height: 1rem;
   overflow: hidden;
-  transition: width 0.3s;
 }
 
 .progress-bar {
   height: 100%;
   background-color: #687a92;
-  transition: width 0.3s;
+  transition: width 1s;
 }
 
 .process-container {
