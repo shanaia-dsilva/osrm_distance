@@ -360,6 +360,11 @@ p {
   display: none;
 }
 
+.modal-title,
+.modal p {
+  margin:0.5rem 0;
+  padding:0;
+}
 .modal {
   position: fixed;
   z-index: 1000;
@@ -379,10 +384,11 @@ p {
 }
 
 .modal .progress {
-  background-color: #f0f0f0;
+  background-color: black;
   border-radius: 4px;
   height: 1rem;
   overflow: hidden;
+  transition: width 0.3s;
 }
 
 .progress-bar {
@@ -430,7 +436,8 @@ p {
 }
 
 
-.app-btn {
+.app-btn,
+.calc-btn {
   background-color: beige;
   font-size: small;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -444,7 +451,8 @@ p {
   margin: 5px 0;
 }
 
-.app-btn:hover {
+.app-btn:hover ,
+.calc-btn:hover {
   background-color: #cb997e;
   border: 1px solid #cb997e;
 }

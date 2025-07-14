@@ -3,13 +3,17 @@ import pandas as pd
 import logging
 import time
 from urllib.parse import urljoin
-from app import app
+from flask import current_app
+import uuid
+from flask import g
+
+progress_tracker = {}
 
 logger = logging.getLogger(__name__)
 
 class OSRMService:
     def __init__(self):
-        self.base_url = app.config['OSRM_SERVER']
+        self.base_url = current_app.config['OSRM_SERVER']
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': 'OSRM-Distance-Calculator/1.0'})
         
@@ -36,7 +40,7 @@ class OSRMService:
             response.raise_for_status()
             
             data = response.json()
-            
+
             if data.get('code') == 'Ok' and data.get('routes'):
                 # Extract distance in meters and convert to kilometers
                 distance_m = data['routes'][0]['distance']
@@ -82,14 +86,15 @@ class OSRMService:
                 'error': f'Calculation error: {str(e)}'
             }
     
-    def calculate_batch_distances(self, df):
+    def calculate_batch_distances(self, df, task_id=None):
         """Calculate distances for a batch of routes"""
         logger.info(f"Starting batch distance calculation for {len(df)} routes")
-        
+
+        total = len(df)
         results = []
         successful_count = 0
         failed_count = 0
-        
+
         for index, row in df.iterrows():
             try:
                 # Extract coordinates
@@ -97,29 +102,37 @@ class OSRMService:
                 lon1 = float(row['Point 1 longitude'])
                 lat2 = float(row['Point 2 latitude'])
                 lon2 = float(row['Point 2 longitude'])
-                
+
                 # Calculate distance
                 result = self.calculate_distance(lat1, lon1, lat2, lon2)
-                
+
                 # Add original data to result
                 result_row = row.to_dict()
                 result_row['Distance_km'] = result['distance_km']
                 result_row['Duration_minutes'] = result['duration_minutes']
                 result_row['Calculation_status'] = result['status']
-                
+
                 if result['status'] == 'error':
                     result_row['Error_message'] = result['error']
                     failed_count += 1
                 else:
                     successful_count += 1
-                
+
                 results.append(result_row)
-                
+
+                # ✅ Update progress
+                if task_id:
+                    percent = round(((index + 1) / total) * 100, 1)
+                    progress_tracker[task_id] = {
+                        'percent': percent,
+                        'message': f'Calculated {index + 1} of {total} routes...'
+                    }
+
                 time.sleep(0.1)
-                
+
                 if (index + 1) % 10 == 0:
-                    logger.info(f"Processed {index + 1}/{len(df)} routes")
-                    
+                    logger.info(f"Processed {index + 1}/{total} routes")
+
             except Exception as e:
                 logger.error(f"Error processing row {index}: {str(e)}")
                 result_row = row.to_dict()
@@ -129,11 +142,25 @@ class OSRMService:
                 result_row['Error_message'] = f'Processing error: {str(e)}'
                 results.append(result_row)
                 failed_count += 1
-        
+
+                # Still update progress if task_id is available
+                if task_id:
+                    percent = round(((index + 1) / total) * 100, 1)
+                    progress_tracker[task_id] = {
+                        'percent': percent,
+                        'message': f'Calculated {index + 1} of {total} routes...'
+                    }
+
         logger.info(f"Batch calculation completed: {successful_count} successful, {failed_count} failed")
         
+        if task_id:
+            progress_tracker[task_id] = {
+                'percent': 100,
+                'message': 'Distance calculation complete.'
+            }
+
         return pd.DataFrame(results)
-    
+
     def test_connection(self):
         """Test connection to OSRM server"""
         try:

@@ -268,19 +268,30 @@ function showPreview(preview) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
 }
+// =======================
+// UUID Generator
+function generateUUID() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
 
 // =======================
-// Distance Calculation
-// =======================
-function calculateDistances() {
+// Distance Calculation with Progress
+async function calculateDistances() {
     if (!currentData) return showStatus('No data loaded.', 'error');
 
     const modal = document.getElementById('progressModal');
     modal.classList.remove('hidden');
     modal.classList.add('show');
-    updateProgress(25, 'Sending data to server...');
+
+    const taskId = generateUUID();
+    // updateProgress(5, 'Initializing...');
+    
+    pollProgress(taskId);
 
     const payload = {
+        task_id: taskId,
         data: currentData.map(row => ({
             'Institute': row[1],
             'Vehicle Number': row[0],
@@ -291,13 +302,15 @@ function calculateDistances() {
         }))
     };
 
-    fetch('/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
+    try {
+        const res = await fetch('/calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
         if (data.success) {
             currentResults = data.results;
             showResults(data);
@@ -306,19 +319,89 @@ function calculateDistances() {
         } else {
             showStatus(data.error, 'error');
         }
-    })
-    .catch(err => {
+    } catch (err) {
         console.error('Distance calculation error:', err);
         showStatus('Error during distance calculation.', 'error');
-    })
-    .finally(() => {
+    } finally {
         setTimeout(() => {
             modal.classList.remove('show');
             modal.classList.add('hidden');
             updateProgress(0, '');
-        }, 1000);
-    });
+        }, 1500);
+    }
+
 }
+
+// =======================
+// Progress Polling Function
+function pollProgress(taskId) {
+    const interval = setInterval(async () => {
+        try {
+            const res = await fetch(`/progress/${taskId}`);
+            const data = await res.json();
+
+            if (data.percent != null) {
+                updateProgress(data.percent, data.message || `${data.percent}% complete`);
+            }
+
+            if (data.percent >= 100) {
+                clearInterval(interval);
+            }
+        } catch (err) {
+            console.warn('Progress polling error:', err);
+            clearInterval(interval);
+        }
+    }, 1000);
+}
+
+// function calculateDistances() {
+//     if (!currentData) return showStatus('No data loaded.', 'error');
+
+//     const modal = document.getElementById('progressModal');
+//     modal.classList.remove('hidden');
+//     modal.classList.add('show');
+//     updateProgress(25, 'Sending data to server...');
+
+//     const payload = {
+//         data: currentData.map(row => ({
+//             'Institute': row[1],
+//             'Vehicle Number': row[0],
+//             'Point 1 latitude': row[2],
+//             'Point 1 longitude': row[3],
+//             'Point 2 latitude': row[4],
+//             'Point 2 longitude': row[5]
+//         }))
+//     };
+
+//     fetch('/calculate', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(payload)
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         if (data.success) {
+//             currentResults = data.results;
+//             showResults(data);
+//             updateProgress(100, 'Completed!');
+//             showStatus('Distance calculation complete.', 'success');
+//         } else {
+//             showStatus(data.error, 'error');
+//         }
+//     })
+//     .catch(err => {
+//         console.error('Distance calculation error:', err);
+//         showStatus('Error during distance calculation.', 'error');
+//     })
+//     .finally(() => {
+//         setTimeout(() => {
+//             modal.classList.remove('show');
+//             modal.classList.add('hidden');
+//             updateProgress(0, '');
+//         }, 1000);
+//     });
+// }
+
 
 // =======================
 // Show Results Table

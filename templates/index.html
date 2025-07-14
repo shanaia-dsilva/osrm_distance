@@ -168,7 +168,7 @@
       <p id="preview-info">(First 5 rows)</p>
       <table class="table-preview" id="preview-table"></table>
       <div class="calculate-button-wrapper">
-        <button class="app-btn" onclick="calculateDistances()" id="app-btn">
+        <button class="calc-btn" onclick="calculateDistances()" id="calc-btn">
           <img src="/uploads/route.png" width="16" alt="Calculate" />Calculate Distances
         </button>
       </div>
@@ -194,7 +194,10 @@
     <div class="modal hidden" id="progressModal">
       <div class="modal-content">
         <h5 class="modal-title">Calculating Distances</h5>
-        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+        <div class="progress">
+          <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+        </div>
+        
         <p id="progress-text">Initializing calculation...</p>
       </div>
     </div>

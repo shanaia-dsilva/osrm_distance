@@ -6,8 +6,9 @@ from werkzeug.utils import secure_filename
 import pandas as pd
 import io
 from app import app
-from osrm_service import OSRMService
+from osrm_service import OSRMService, progress_tracker
 from data_processor import DataProcessor
+
 
 logger = logging.getLogger(__name__)
 
@@ -103,28 +104,24 @@ def calculate_distances():
         if not data or 'data' not in data:
             return jsonify({'error': 'No data provided for calculation'}), 400
         
-        # Convert data back to DataFrame
         df = pd.DataFrame(data['data'])
-        
-        # Validate required columns
+        task_id = data.get('task_id')  # ✅ NEW
+
         processor = DataProcessor()
         if not processor.validate_columns(df):
             return jsonify({'error': 'Invalid data format. Please check required columns.'}), 400
-        
-        # Calculate distances using OSRM
+
         osrm_service = OSRMService()
         try:
-            results_df = osrm_service.calculate_batch_distances(df)
+            results_df = osrm_service.calculate_batch_distances(df, task_id=task_id)  # ✅ Pass task_id
             ordered_columns = [
                 'Institute', 'Vehicle Number',
                 'Point 1 latitude', 'Point 1 longitude',
                 'Point 2 latitude', 'Point 2 longitude',
-                'Distance_km', 'Duration_minutes','Calculation_status'
+                'Distance_km', 'Duration_minutes', 'Calculation_status'
             ]
-
             results_df = results_df[ordered_columns]
 
-            # Convert results to JSON for frontend
             results = {
                 'success': True,
                 'results': results_df.to_dict('records'),
@@ -134,13 +131,12 @@ def calculate_distances():
                     'failed_calculations': len(results_df[results_df['Distance_km'].isna()])
                 }
             }
-            
             return jsonify(results)
-        
+
         except Exception as e:
             logger.error(f"OSRM calculation error: {str(e)}")
             return jsonify({'error': f'Error calculating distances: {str(e)}'}), 500
-    
+
     except Exception as e:
         logger.error(f"Calculate error: {str(e)}")
         return jsonify({'error': 'An error occurred during calculation'}), 500
@@ -209,3 +205,10 @@ def too_large(e):
 def internal_error(e):
     logger.error(f"Internal server error: {str(e)}")
     return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/progress/<task_id>')
+def get_progress(task_id):
+    progress = progress_tracker.get(task_id)
+    if progress:
+        return jsonify(progress)
+    return jsonify({'percent': 0, 'message': 'Starting...'})
