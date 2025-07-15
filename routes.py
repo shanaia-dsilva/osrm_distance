@@ -141,50 +141,6 @@ def calculate_distances():
         logger.error(f"Calculate error: {str(e)}")
         return jsonify({'error': 'An error occurred during calculation'}), 500
 
-@app.route('/calculateMatrix', methods=['POST'])
-def calculate_distances():
-    try:
-        data = request.get_json()
-        if not data or 'data' not in data:
-            return jsonify({'error': 'No data provided for calculation'}), 400
-        
-        df = pd.DataFrame(data['data'])
-        task_id = data.get('task_id')  # ✅ NEW
-
-        processor = DataProcessor()
-        if not processor.validate_columns(df):
-            return jsonify({'error': 'Invalid data format. Please check required columns.'}), 400
-
-        osrm_service = OSRMService()
-        try:
-            results_df = osrm_service.calculate_matrix(df, task_id=task_id)
-            # ordered_columns = [
-            #     'Institute', 'Vehicle Number',
-            #     'Point 1 latitude', 'Point 1 longitude',
-            #     'Point 2 latitude', 'Point 2 longitude',
-            #     'Distance_km', 'Duration_minutes', 'Calculation_status'
-            # ]
-            # results_df = results_df[ordered_columns]
-
-            results = {
-                'success': True,
-                'results': results_df.to_dict('records'),
-                'summary': {
-                    'total_routes': len(results_df),
-                    'successful_calculations': len(results_df[results_df['Distance_km'].notna()]),
-                    'failed_calculations': len(results_df[results_df['Distance_km'].isna()])
-                }
-            }
-            return jsonify(results)
-
-        except Exception as e:
-            logger.error(f"OSRM calculation error: {str(e)}")
-            return jsonify({'error': f'Error calculating distances: {str(e)}'}), 500
-
-    except Exception as e:
-        logger.error(f"Calculate error: {str(e)}")
-        return jsonify({'error': 'An error occurred during calculation'}), 500
-
 @app.route('/export/<format>')
 def export_results(format):
     try:

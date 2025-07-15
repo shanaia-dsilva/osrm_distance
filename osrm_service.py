@@ -141,64 +141,7 @@ class OSRMService:
             }
 
         return pd.DataFrame(results)
-    
-    def calculate_matrix(self, df, task_id=None):
-        """Calculate distance matrix for a batch of routes"""
-        logger.info(f"Starting distance matrix calculation for {len(df)} routes")
 
-        total = len(df)
-        results = []
-        successful_count = 0
-        failed_count = 0
-
-        for index, row in df.iterrows():
-            try:
-                lat1 = float(row['Point 1 latitude'])
-                lon1 = float(row['Point 1 longitude'])
-                lat2 = float(row['Point 2 latitude'])
-                lon2 = float(row['Point 2 longitude'])
-
-                result = self.calculate_distance(
-                    lat1, lon1, lat2, lon2,
-                    task_id=task_id, index=index, total=total
-                )
-
-                result_row = row.to_dict()
-                result_row['Distance_km'] = result['distance_km']
-                result_row['Duration_minutes'] = result['duration_minutes']
-                result_row['Calculation_status'] = result['status']
-
-                if result['status'] == 'error':
-                    result_row['Error_message'] = result['error']
-                    failed_count += 1
-                else:
-                    successful_count += 1
-
-                results.append(result_row)
-
-                time.sleep(0.1)  # Optional: throttle for OSRM stability
-
-            except Exception as e:
-                logger.error(f"Error processing row {index}: {str(e)}")
-                result_row = row.to_dict()
-                result_row['Distance_km'] = None
-                result_row['Duration_minutes'] = None
-                result_row['Calculation_status'] = 'error'
-                result_row['Error_message'] = f'Processing error: {str(e)}'
-                results.append(result_row)
-                failed_count += 1
-
-        logger.info(f"Matrix calculation completed: {successful_count} successful, {failed_count} failed")
-
-        if task_id:
-            progress_tracker[task_id] = {
-                'percent': 100,
-                'message': 'Completed!'
-            }
-
-        return pd.DataFrame(results)
-    
-    
     def test_connection(self):
         """Test connection to OSRM server"""
         try:

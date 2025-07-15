@@ -436,7 +436,8 @@ p {
 
 
 .app-btn,
-.calc-btn {
+.calc-btn,
+.calc-matrix-btn {
   background-color: beige;
   font-size: small;
   font-family: Verdana, Geneva, Tahoma, sans-serif;

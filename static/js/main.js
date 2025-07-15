@@ -332,8 +332,7 @@ async function calculateDistances() {
 }
 
 
-
-async function calculateDistanceMatrix() {
+async function calculateMatrix() {
     if (!currentData) return showStatus('No data loaded.', 'error');
 
     const modal = document.getElementById('progressModal');
@@ -341,8 +340,7 @@ async function calculateDistanceMatrix() {
     modal.classList.add('show');
 
     const taskId = generateUUID();
-    
-    pollProgress(taskId);
+    updateProgress(5, 'Initializing matrix calculation...');
 
     const payload = {
         task_id: taskId,
@@ -367,15 +365,15 @@ async function calculateDistanceMatrix() {
 
         if (data.success) {
             currentResults = data.results;
-            showResults(data);
-            updateProgress(100, 'Completed!');
-            showStatus('Distance calculation complete.', 'success');
+            showMatrixResults(data.results); // different display function
+            updateProgress(100, 'Matrix calculation complete.');
+            showStatus('Distance matrix calculation complete.', 'success');
         } else {
             showStatus(data.error, 'error');
         }
     } catch (err) {
-        console.error('Distance calculation error:', err);
-        showStatus('Error during distance calculation.', 'error');
+        console.error('Matrix calculation error:', err);
+        showStatus('Error during matrix calculation.', 'error');
     } finally {
         setTimeout(() => {
             modal.classList.remove('show');
@@ -384,7 +382,44 @@ async function calculateDistanceMatrix() {
         }, 1500);
     }
 
+    pollProgress(taskId);
 }
+
+function showMatrixResults(results) {
+    const table = document.getElementById('resultsTable');
+    table.innerHTML = ''; // Clear any previous content
+
+    if (!results || results.length === 0) {
+        showStatus('No results to display.', 'error');
+        return;
+    }
+
+    const headers = Object.keys(results[0]);
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    headers.forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    results.forEach(row => {
+        const tr = document.createElement('tr');
+        headers.forEach(col => {
+            const td = document.createElement('td');
+            td.textContent = row[col];
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    document.getElementById('exportBtn').style.display = 'block';
+}
+
 // =======================
 // Progress Polling Function
 function pollProgress(taskId) {
