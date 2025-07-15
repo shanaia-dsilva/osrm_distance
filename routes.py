@@ -157,7 +157,7 @@ def calculate_distances():
 
         osrm_service = OSRMService()
         try:
-            results_df = osrm_service.calculate_distance_matrix(df, task_id=task_id)
+            results_df = osrm_service.calculate_matrix(df, task_id=task_id)
             # ordered_columns = [
             #     'Institute', 'Vehicle Number',
             #     'Point 1 latitude', 'Point 1 longitude',
