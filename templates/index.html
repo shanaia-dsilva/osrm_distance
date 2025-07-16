@@ -5,13 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OSRM Distance Calculator</title>
-
-  <!-- CSS -->
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
 </head>
 
 <body>
-  <!-- Navigation -->
   <nav id="nav-bar">
     <div class="custom-container">
       <div class="nav-content">
@@ -21,7 +18,6 @@
     </div>
   </nav>
 
-  <!-- Dashboard Section -->
   <section id="dashboard-sec">
     <div class="custom-container">
       <div class="title-text">
@@ -36,10 +32,8 @@
 
   <hr class="section-divider" />
 
-  <!-- Description Section -->
   <section id="description-sec">
     <div class="process-container">
-      <!-- Phase Cards -->
       <div class="phase">
         <div class="col">
           <div class="phase-card" onclick="document.getElementById('file-input').click()">
@@ -67,7 +61,6 @@
         </div>
       </div>
 
-      <!-- Upload + File Stat -->
       <div class="custom-row">
         <div class="data-container">
           <h3>Upload Your Files.</h3>
@@ -76,8 +69,6 @@
             <button class="btn-toggle" onclick="switchToUpload()">File Upload</button>
             <button class="btn-toggle" onclick="switchToPaste()">Paste Data</button>
           </div>
-
-          <!-- File Upload Section -->
           <div id="upload-section" class="upload-section">
             <div class="drag-area" id="drag-area">
               <form id="csv-form" enctype="multipart/form-data">
@@ -99,7 +90,6 @@
             </div>
           </div>
 
-          <!-- Paste Section -->
           <div id="paste-section" class="paste-section" style="display: none;">
             <div class="paste-area">
               <div class="paste-container">
@@ -132,12 +122,9 @@
               <button type="button" class="app-btn" id="reset-paste-btn">Reset Fields</button>
             </div>
           </div>
-
-          <!-- Status Messages -->
           <div id="status" class="status-box"></div>
         </div>
 
-        <!-- File Stat Section -->
         <div id="file-stat">
           <h3>
             <img src="/uploads/required.jpg" width="24" class="project-icon" alt="Info" />Required CSV Format:
@@ -161,7 +148,6 @@
     </div>
   </section>
 
-  <!-- Preview Section -->
   <section id="preview-section" class="preview-section" style="display: none;">
     <div class="table-wrapper">
       <h4>Preview of your data:</h4>
@@ -175,7 +161,6 @@
     </div>
   </section>
 
-  <!-- Results Section -->
   <section id="results-sect">
     <h3>Distance Calculation Results:</h3>
     <div class="results-section" id="results-section" style="display: none;">
@@ -190,7 +175,6 @@
       <table class="results-table" id="results-table"></table>
     </div>
 
-    <!-- Progress Modal -->
     <div class="modal hidden" id="progressModal">
       <div class="modal-content">
         <h5 class="modal-title">Calculating Distances</h5>
@@ -203,7 +187,6 @@
     </div>
   </section>
 
-  <!-- JavaScript at bottom -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
