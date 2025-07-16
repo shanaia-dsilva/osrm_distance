@@ -159,10 +159,13 @@ function initializeSmartPaste() {
             if (!pastedText.includes('\t')) return;
 
             e.preventDefault();
+            let lines = pastedText.trim().split('\n').map(line => line.split('\t'));
 
-            const lines = pastedText.trim().split('\n').map(line => line.split('\t'));
+            if (lines.every(cells => cells.length === 1)) {
+                lines = pastedText.trim().split('\n').map(line => line.trim().split(/\s{2,}|\s*\|\s*/));
+            }
 
-            // Check for headers in first row and skip
+
             const isHeaderRow = lines[0].some(cell =>
                 /vehicle|institute|lat|lon/i.test(cell)
             );
