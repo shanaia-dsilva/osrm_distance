@@ -9,13 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setupResetButton();
     document.getElementById('process-data-btn').addEventListener('click', processPastedData);
     const modal = document.getElementById('progressModal');
-    modal.classList.add('hidden');     // Force hide
-    modal.classList.remove('show');    // Ensure it's not visible
+    modal.classList.add('hidden');    
+    modal.classList.remove('show');   
     updateProgress(0, '');  
 });
 
 // =======================
-// File Upload
+// upload
 
 function setupFileUpload() {
     const form = document.getElementById('csv-form');
@@ -62,7 +62,7 @@ function uploadCSV() {
 }
 
 // =======================
-// Drag & Drop
+// drag dropp
 function setupDragDrop() {
     const dragArea = document.getElementById('drag-area');
 
@@ -171,7 +171,6 @@ function initializeSmartPaste() {
             );
             const dataRows = isHeaderRow ? lines.slice(1) : lines;
 
-            // Fill starting from the currently focused field
             dataRows.forEach((row, rowIndex) => {
                 row.forEach((cell, offset) => {
                     const colIndex = startIndex + offset;
@@ -232,9 +231,7 @@ function processPastedData() {
         });
 }
 
-// =======================
-// Preview Table
-// =======================
+// =======================preview
 function showPreview(preview) {
     const table = document.getElementById('preview-table');
     const info = document.getElementById('preview-info');
@@ -272,7 +269,7 @@ function showPreview(preview) {
     }, 100);
 }
 // =======================
-// UUID Generator
+// UUID  genr
 function generateUUID() {
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
@@ -280,7 +277,7 @@ function generateUUID() {
 }
 
 // =======================
-// Distance Calculation with Progress
+// calculating distances
 async function calculateDistances() {
     if (!currentData) return showStatus('No data loaded.', 'error');
 
@@ -334,97 +331,8 @@ async function calculateDistances() {
 
 }
 
-
-async function calculateMatrix() {
-    if (!currentData) return showStatus('No data loaded.', 'error');
-
-    const modal = document.getElementById('progressModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('show');
-
-    const taskId = generateUUID();
-    updateProgress(5, 'Initializing matrix calculation...');
-
-    const payload = {
-        task_id: taskId,
-        data: currentData.map(row => ({
-            'Institute': row[1],
-            'Vehicle Number': row[0],
-            'Point 1 latitude': row[2],
-            'Point 1 longitude': row[3],
-            'Point 2 latitude': row[4],
-            'Point 2 longitude': row[5]
-        }))
-    };
-
-    try {
-        const res = await fetch('/calculateMatrix', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            currentResults = data.results;
-            showMatrixResults(data.results); // different display function
-            updateProgress(100, 'Matrix calculation complete.');
-            showStatus('Distance matrix calculation complete.', 'success');
-        } else {
-            showStatus(data.error, 'error');
-        }
-    } catch (err) {
-        console.error('Matrix calculation error:', err);
-        showStatus('Error during matrix calculation.', 'error');
-    } finally {
-        setTimeout(() => {
-            modal.classList.remove('show');
-            modal.classList.add('hidden');
-            updateProgress(0, '');
-        }, 1500);
-    }
-
-    pollProgress(taskId);
-}
-
-function showMatrixResults(results) {
-    const table = document.getElementById('resultsTable');
-    table.innerHTML = ''; // Clear any previous content
-
-    if (!results || results.length === 0) {
-        showStatus('No results to display.', 'error');
-        return;
-    }
-
-    const headers = Object.keys(results[0]);
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-    headers.forEach(col => {
-        const th = document.createElement('th');
-        th.textContent = col;
-        headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    results.forEach(row => {
-        const tr = document.createElement('tr');
-        headers.forEach(col => {
-            const td = document.createElement('td');
-            td.textContent = row[col];
-            tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-
-    document.getElementById('exportBtn').style.display = 'block';
-}
-
 // =======================
-// Progress Polling Function
+// progress fn
 function pollProgress(taskId) {
     const interval = setInterval(async () => {
         try {
@@ -446,9 +354,7 @@ function pollProgress(taskId) {
 }
 
 
-// =======================
-// Show Results Table
-// =======================
+// ==========
 function showResults(data) {
     const table = document.getElementById('results-table');
     const section = document.getElementById('results-section');
@@ -503,8 +409,6 @@ function showResults(data) {
     section.scrollIntoView({ behavior: 'smooth' });
 }
 
-// =======================
-// Export CSV
 // =======================
 function exportResults() {
     if (!currentResults) return showStatus('No results to export.', 'error');
