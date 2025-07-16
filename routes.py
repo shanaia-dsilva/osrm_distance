@@ -27,14 +27,12 @@ def upload_file():
             return jsonify({'error': 'No file selected'}), 400
         
         if file and file.filename.lower().endswith('.csv'):
-            # Process CSV file
+        
             processor = DataProcessor()
             try:
                 df = processor.process_csv_file(file)
                 preview_data = processor.get_preview_data(df)
                 
-                # Store the dataframe in session or temporary storage
-                # For simplicity, we'll return the preview and let frontend handle the calculation
                 # return jsonify({
                 #     'success': True,
                 #     'preview': preview_data,
@@ -144,7 +142,6 @@ def calculate_distances():
 @app.route('/export/<format>')
 def export_results(format):
     try:
-        # Get results from request args or session
         data = request.args.get('data')
         if not data:
             return jsonify({'error': 'No data to export'}), 400
@@ -161,7 +158,6 @@ def export_results(format):
         
         df = df[ordered_columns] 
 
-        
         if format.lower() == 'csv':
             output = io.StringIO()
             df.to_csv(output, index=False)

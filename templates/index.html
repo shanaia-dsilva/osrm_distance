@@ -5,7 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OSRM Distance Calculator</title>
+
   <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
 
 <body>
@@ -22,18 +25,20 @@
     <div class="custom-container">
       <div class="title-text">
         <div class="header">
-          <h1>OSRM Distance Tool</h1>
-          <p class="lead">Easy to use routing tool. Calculates distances automatically for the imported data.</p>
+          <h1>Route Optimization Tool</h1>
+          <p class="lead">Upload route data and optimize driver assignments</p>
         </div>
-        <div class="optim-project"></div>
+        <div class="optim-project">
+        </div>
       </div>
-    </div>
   </section>
 
   <hr class="section-divider" />
 
   <section id="description-sec">
+
     <div class="process-container">
+
       <div class="phase">
         <div class="col">
           <div class="phase-card" onclick="document.getElementById('file-input').click()">
@@ -43,7 +48,7 @@
         </div>
         <div class="col">
           <div class="phase-card">
-            <img src="/uploads/optimize-icon.png" class="project-icon" alt="Processing" />
+            <img src="/uploads/process.png" class="project-icon" alt="Processing" />
             <p class="project-title">Phase 2<br />Data Processing</p>
           </div>
         </div>
@@ -64,11 +69,11 @@
       <div class="custom-row">
         <div class="data-container">
           <h3>Upload Your Files.</h3>
-
           <div class="input-toggle">
             <button class="btn-toggle" onclick="switchToUpload()">File Upload</button>
             <button class="btn-toggle" onclick="switchToPaste()">Paste Data</button>
           </div>
+
           <div id="upload-section" class="upload-section">
             <div class="drag-area" id="drag-area">
               <form id="csv-form" enctype="multipart/form-data">
@@ -90,7 +95,7 @@
             </div>
           </div>
 
-          <div id="paste-section" class="paste-section" style="display: none;">
+           <div id="paste-section" class="paste-section" style="display: none;">
             <div class="paste-area">
               <div class="paste-container">
                 <div class="paste-col">
@@ -122,39 +127,41 @@
               <button type="button" class="app-btn" id="reset-paste-btn">Reset Fields</button>
             </div>
           </div>
+
           <div id="status" class="status-box"></div>
         </div>
-
         <div id="file-stat">
           <h3>
             <img src="/uploads/required.jpg" width="24" class="project-icon" alt="Info" />Required CSV Format:
           </h3>
           <p>Required columns (exact names):</p>
-          <div class="table-preview-wrapper">
+          <div class="table-wrapper">
             <table class="preview">
-              <tr><td>Vehicle Number</td></tr>
-              <tr><td>Institute</td></tr>
-              <tr><td>Point 1 latitude</td></tr>
-              <tr><td>Point 1 longitude</td></tr>
-              <tr><td>Point 2 latitude</td></tr>
-              <tr><td>Point 2 longitude</td></tr>
+              <tr><td>Vehicle Number</td>
+                <td>Institute</td></tr>
+              <tr><td>Point 1 latitude</td><td>Point 1 longitude</td></tr>
+              <tr><td>Point 2 latitude</td><td>Point 2 longitude</td></tr>
             </table>
           </div>
           <div class="download-sample-link">
-            <a href="/uploads/sample_distance_generator_data.csv">Download Sample CSV</a>
+            <a href="/uploads/sample-data.csv">Download Sample CSV</a>
           </div>
+          <br>
+          <p>Note: Please enter a list of names of depot/parking locations present in the uploaded data that are
+            <strong>institute-specific</strong>, if there are none leave it blank
+          </p>
         </div>
       </div>
+
     </div>
   </section>
-
   <section id="preview-section" class="preview-section" style="display: none;">
     <div class="table-wrapper">
       <h4>Preview of your data:</h4>
       <p id="preview-info">(First 5 rows)</p>
       <table class="table-preview" id="preview-table"></table>
       <div class="calculate-button-wrapper">
-        <button class="calc-btn" onclick="calculateDistances()" id="calc-btn">
+        <button class="app-btn" onclick="calculateDistances()" id="app-btn">
           <img src="/uploads/route.png" width="16" alt="Calculate" />Calculate Distances
         </button>
       </div>
@@ -164,6 +171,7 @@
   <section id="results-sect">
     <h3>Distance Calculation Results:</h3>
     <div class="results-section" id="results-section" style="display: none;">
+
       <div class="results-container">
         <div id="results-summary" class="summary"></div>
         <div class="export">
@@ -174,7 +182,6 @@
       </div>
       <table class="results-table" id="results-table"></table>
     </div>
-
     <div class="modal hidden" id="progressModal">
       <div class="modal-content">
         <h5 class="modal-title">Calculating Distances</h5>
@@ -186,7 +193,6 @@
       </div>
     </div>
   </section>
-
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
