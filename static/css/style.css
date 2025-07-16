@@ -1,11 +1,9 @@
-/* Base layout */
 body {
   background-color: ivory;
   font-family: Verdana, 'Courier New', Courier, monospace, Geneva, Tahoma, sans-serif;
   margin: 0;
   padding: 0;
 }
-
 @font-face {
   font-family: 'clashdisplay';
   src: url('/uploads/clashdisplay-Medium.woff') format('woff');
@@ -28,8 +26,6 @@ body {
   width: 20px;
   margin-right: 10px;
 }
-
-/* Dashboard */
 #dashboard-sec {
   margin: 1rem 2rem;
 }
@@ -55,16 +51,13 @@ p {
   margin: 0;
 }
 
-/* Description */
 #description-sec {
   margin: 1rem 2.5rem;
 }
-
 .text-center {
   text-align: center;
 }
 
-/* Phase cards */
 .phase {
   display: flex;
   flex-direction: column;
@@ -94,7 +87,6 @@ p {
 
 .project-icon {
   height: 20px;
-  /* margin-bottom: 5px; */
 }
 
 .project-title {
@@ -102,8 +94,6 @@ p {
   color: #555;
   margin: 0;
 }
-
-/* Row and Column Structure */
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -114,7 +104,6 @@ p {
   flex: 1 1 48%;
 }
 
-/* Upload + Paste Container */
 .data-container {
   background-color: beige;
   border: 1px solid lightgray;
@@ -123,8 +112,6 @@ p {
   min-height: 90%;
   width:50vw;
 }
-
-/* CSV Format Card */
 #file-stat {
   background-color: beige;
   padding: 1rem;
@@ -140,7 +127,6 @@ p {
   border-left: 1px solid #e5b79e;
   border-radius: 5px;
   border:collapse;
-  /* border-bottom: 0px; */
   font-family: 'Courier New', Courier, monospace;
   font-size: small;
   margin: 1rem 0;
@@ -174,7 +160,6 @@ p {
   border: 1px solid  rgb(223, 223, 190);
 }
 
-/* Drag Area */
 .drag-area {
   border: 2px dashed #dddcdc;
   position: relative;
@@ -220,7 +205,6 @@ p {
   margin-top: 10px;
 }
 
-/* Upload + Paste buttons */
 .input-toggle {
   margin-bottom: 1rem;
   display: flex;
@@ -236,16 +220,13 @@ p {
   cursor: pointer;
   font-weight: 600;
 }
-
 .btn-toggle:hover {
   background-color: #cb997e;
   border: 1px solid #cb997e;
 }
-
 .paste-section {
   font-size: small;
 }
-/* Text Area Paste */
 .paste-container {
   display: flex;
   overflow-x: auto;
@@ -259,10 +240,7 @@ p {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* border: 1px solid #ccc; */
-  /* border-radius: 6px; */
 }
-
 .paste-col label {
   font-weight: bold;
   font-size: small;
@@ -277,7 +255,6 @@ p {
   border-left: #555 solid 1px;
   padding:6px 0;
 }
-
 .text-area {
   resize: vertical;
   width: 82%;
@@ -294,10 +271,7 @@ p {
   font-size: 0.8rem;
   padding: 0.5rem;
   border: 1px solid #ccc;
-  /* border:collapse; */
-  /* border-radius: 6px; */
 }
-
 .upload-btn {
   background-color: #687a92;
   color: black;
@@ -310,20 +284,16 @@ p {
   cursor: pointer;
   margin: 10px 0;
 }
-
 .upload-btn:hover {
   background-color: #e5b79e;
   color: black;
 }
-
-
 .table-wrapper {
   padding: 0 1rem;
   font-size: small;
   font-family: 'Courier New', Courier, monospace;
   overflow-x: auto;
 }
-
 .table-preview {
   width: 100%;
   font-family: 'Courier New', Courier, monospace;
@@ -332,7 +302,6 @@ p {
   border: 1px solid #e5b79e;
   border-radius: 10px;
 }
-
 .table-preview th,
 .table-preview td {
   border: 1px solid #e5b79e;
@@ -348,14 +317,6 @@ p {
   color: slategrey ;
   font-style:oblique;
 }
-
-/* .export {
-  margin-top: 1rem;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  font-weight: 200;
-  background-color: #687a92;
-} */
-
 .hidden {
   display: none;
 }
@@ -378,24 +339,20 @@ p {
   padding: 1rem;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
-
 .modal.show {
   display: block;
 }
-
 .modal .progress {
   background-color: black;
   border-radius: 4px;
   height: 1rem;
   overflow: hidden;
 }
-
 .progress-bar {
   height: 100%;
   background-color: #687a92;
   transition: width 1s;
 }
-
 .process-container {
   display: flex;
   align-items:flex-start;
@@ -414,10 +371,6 @@ p {
 
 }
 
-/* .custom-row .custom-col {
-  width:40vw;
-} */
-
 .results-table {
   width: 100%;
   font-family: 'Courier New', Courier, monospace;
@@ -434,7 +387,6 @@ p {
   text-align: left;
 }
 
-
 .app-btn,
 .calc-btn,
 .calc-matrix-btn {
@@ -450,16 +402,11 @@ p {
   transition: ease-in-out 0.2s;
   margin: 5px 0;
 }
-
 .app-btn:hover ,
 .calc-btn:hover {
   background-color: #cb997e;
   border: 1px solid #cb997e;
 }
-
-
-
-
 .btn-toggle {
   background-color: beige;
   transition: ease-in-out 0.2s;
@@ -511,21 +458,18 @@ img {
     flex-direction: column;
     width:100%;
   }
-
   .process-container {
     flex-direction: column;
     margin: 1rem;
     justify-content: space-between;
   }
-
   .data-container,
   .file-stat {
     width: 100%;
   }
-
   .phase {
     display: grid;
-    grid-template-columns: repeat(4, 2fr); /* Use fractions for equal spacing */
+    grid-template-columns: repeat(4, 2fr); 
     gap: 1rem;
     width: 100%;
   }
@@ -542,16 +486,14 @@ img {
 @media (max-width: 580px) {
   .phase {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 2x2 grid */
-    gap: 1rem; /* Actual gap value */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 1rem; 
     width: 100%;
     box-sizing: border-box;
   }
-
   .phase .col {
     width: 100%;
   }
-
   .phase-card {
     height: 100%;
     padding: 1rem;
@@ -562,7 +504,6 @@ img {
     align-items: center;
   }
 }
-
 
 @media (max-width: 1200px) {
   section {
@@ -585,30 +526,25 @@ section {
     gap: 1rem;
     flex-shrink: 0;
   }
-
   .phase {
     display: flex;
     flex-direction:row;
     justify-content: space-between;
     padding: 0.5rem;
   }
-
   .phase-card {
     margin: 0.25rem;
     padding: 1rem;
     text-align: center;
     font-size: 14px;
   }
-
   .custom-row {
     flex-direction: column;
   }
-
   .custom-col {
     width: 100%;
     margin-bottom: 1rem;
   }
-
   .upload-area,
   .file-stat {
     width: 100%;
@@ -621,10 +557,9 @@ section {
     margin: 0;
     padding: 0;
   }
-
   section {
     margin: 0;
-    padding: 0 0.5rem; /* small padding on sides */
+    padding: 0 0.5rem;
   }
 
   .process-container {
@@ -632,8 +567,6 @@ section {
     flex-direction: column;
     gap: 1rem;
   }
-
-  /* Four Phase Cards in a row */
   .phase {
     display: flex;
     flex-direction: row;
@@ -642,9 +575,8 @@ section {
     gap: 0.5rem;
     margin: 0 auto;
   }
-
   .phase .col {
-    flex: 1 1 23%; /* 4 cards in a row with gap */
+    flex: 1 1 23%; 
     min-width: 70px;
   }
 
@@ -654,18 +586,15 @@ section {
     font-size: 13px;
     border-radius: 6px;
   }
-
   .project-icon {
     width: 24px;
     height: 24px;
   }
-
   .custom-row {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-
   .data-container,
   #file-stat {
     width: 100%;
@@ -675,20 +604,17 @@ section {
     background-color: #fffefc;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
   }
-
   .input-toggle {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     gap: 0.5rem;
   }
-
   .btn-toggle {
     flex: 1;
     font-size: 14px;
     padding: 0.5rem;
   }
-
   .table-preview-wrapper,
   .paste-container {
     overflow-x: auto;
@@ -703,16 +629,13 @@ section {
 
   section {
     margin: 0;
-    padding: 0 0.5rem; /* small padding on sides */
+    padding: 0 0.5rem; 
   }
-
   .process-container {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-
-  /* Four Phase Cards in a row */
   .phase {
     display: flex;
     flex-direction: row;
@@ -723,28 +646,24 @@ section {
   }
 
   .phase .col {
-    flex: 1 1 23%; /* 4 cards in a row with gap */
+    flex: 1 1 23%;
     min-width: 70px;
   }
-
   .phase-card {
     padding: 0.75rem 0.5rem;
     text-align: center;
     font-size: 13px;
     border-radius: 6px;
   }
-
   .project-icon {
     width: 24px;
     height: 24px;
   }
-
   .custom-row {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-
   .data-container,
   #file-stat {
     width: 100%;
@@ -754,7 +673,6 @@ section {
     background-color: #fffefc;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
   }
-
   .input-toggle {
     display: flex;
     flex-direction: row;
@@ -767,7 +685,6 @@ section {
     font-size: 14px;
     padding: 0.5rem;
   }
-
   .table-preview-wrapper,
   .paste-container {
     overflow-x: auto;
@@ -780,19 +697,15 @@ section {
     margin: 0;
     padding: 0;
   }
-
   section {
     margin: 0;
-    padding: 0 0.5rem; /* small padding on sides */
+    padding: 0 0.5rem; 
   }
-
   .process-container {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
-
-  /* Four Phase Cards in a row */
   .phase {
     display: flex;
     flex-direction: row;
@@ -801,9 +714,8 @@ section {
     gap: 0.5rem;
     margin: 0 auto;
   }
-
   .phase .col {
-    flex: 1 1 23%; /* 4 cards in a row with gap */
+    flex: 1 1 23%; 
     min-width: 70px;
   }
 
@@ -818,7 +730,6 @@ section {
     width: 24px;
     height: 24px;
   }
-
   .custom-row {
     display: flex;
     flex-direction: column;
@@ -834,20 +745,17 @@ section {
     background-color: beige;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
   }
-
   .input-toggle {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     gap: 0.5rem;
   }
-
   .btn-toggle {
     flex: 1;
     font-size: 14px;
     padding: 0.5rem;
   }
-
   .table-preview-wrapper,
   .paste-container {
     overflow-x: auto;
